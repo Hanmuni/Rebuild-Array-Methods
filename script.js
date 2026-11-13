@@ -1,6 +1,23 @@
+// Test function
+const testResult = (actual, expected, testName) => {
+  if (JSON.stringify(actual) === JSON.stringify(expected)) {
+    console.log(`Passed: ${testName}`);
+  } else {
+    console.log(`Failed: ${testName}`);
+    console.log(`Expected: ${expected}`);
+    console.log(`Actual: ${actual}`);
+  }
+};
+
 // forEach
 const forEach = (array, instructionFunction) => {
-  for (let i = 0; i < array.length; i += 1) {
+  const length = array.length;
+
+  for (let i = 0; i < length; i += 1) {
+    if (!(i in array)) {
+      continue;
+    }
+
     instructionFunction(array[i], i, array);
   }
 };
@@ -16,8 +33,13 @@ forEach(forEachNumbers, printNumbers);
 // map
 const map = (array, instructionFunction) => {
   const newArray = [];
+  const length = array.length;
 
-  for (let i = 0; i < array.length; i += 1) {
+  for (let i = 0; i < length; i += 1) {
+    if (!(i in array)) {
+      continue;
+    }
+
     const newItem = instructionFunction(array[i], i, array);
     newArray.push(newItem);
   }
@@ -33,16 +55,21 @@ const multiplyByTwo = (number) => {
 
 const doubleNumbers = map(mapNumbers, multiplyByTwo);
 
-console.log(doubleNumbers);
+testResult(doubleNumbers, [4, 8, 12], "map should multiply all numbers by 2");
 
 // filter
 const filter = (array, instructionFunction) => {
   const newArray = [];
+  const length = array.length;
 
-  for (let i = 0; i < array.length; i += 1) {
+  for (let i = 0; i < length; i += 1) {
+    if (!(i in array)) {
+      continue;
+    }
+
     const matchingItem = instructionFunction(array[i], i, array);
 
-    if (matchingItem === true) {
+    if (matchingItem) {
       newArray.push(array[i]);
     }
   }
@@ -58,14 +85,24 @@ const isGreaterThanTen = (number) => {
 
 const numbersGreaterThanTen = filter(filterNumbers, isGreaterThanTen);
 
-console.log(numbersGreaterThanTen);
+testResult(
+  numbersGreaterThanTen,
+  [13, 18, 24],
+  "filter returns a new array with only numbers greater than 10",
+);
 
 // find
 const find = (array, instructionFunction) => {
-  for (let i = 0; i < array.length; i += 1) {
+  const length = array.length;
+
+  for (let i = 0; i < length; i += 1) {
+    if (!(i in array)) {
+      continue;
+    }
+
     const firstMatch = instructionFunction(array[i], i, array);
 
-    if (firstMatch === true) {
+    if (firstMatch) {
       return array[i];
     }
   }
@@ -74,19 +111,29 @@ const find = (array, instructionFunction) => {
 const cities = ["New York", "Hanoi", "Munich", "Helsinki"];
 
 const cityWithH = (city) => {
-  return city.startsWith("H") === true;
+  return city.startsWith("H");
 };
 
 const firstCityWithH = find(cities, cityWithH);
 
-console.log(firstCityWithH);
+testResult(
+  firstCityWithH,
+  "Hanoi",
+  "find returns Hanoi as the first City with H",
+);
 
 // Some
 const some = (array, instructionFunction) => {
-  for (let i = 0; i < array.length; i += 1) {
+  const length = array.length;
+
+  for (let i = 0; i < length; i += 1) {
+    if (!(i in array)) {
+      continue;
+    }
+
     const atLeastOneMatch = instructionFunction(array[i], i, array);
 
-    if (atLeastOneMatch === true) {
+    if (atLeastOneMatch) {
       return true;
     }
   }
@@ -97,19 +144,29 @@ const some = (array, instructionFunction) => {
 const wildcats = ["Tiger", "Leopard", "Jaguar", "Lion", "Cougar"];
 
 const findWildcatsWithL = (wildcat) => {
-  return wildcat.startsWith("L") === true;
+  return wildcat.startsWith("L");
 };
 
 const wildcatsWithL = some(wildcats, findWildcatsWithL);
 
-console.log(wildcatsWithL);
+testResult(
+  wildcatsWithL,
+  true,
+  "some returns true if any wildcat starts with L",
+);
 
 // every
 const every = (array, instructionFunction) => {
-  for (let i = 0; i < array.length; i += 1) {
+  const length = array.length;
+
+  for (let i = 0; i < length; i += 1) {
+    if (!(i in array)) {
+      continue;
+    }
+
     const passingItem = instructionFunction(array[i], i, array);
 
-    if (passingItem === false) {
+    if (!passingItem) {
       return false;
     }
   }
@@ -124,14 +181,27 @@ const isGreaterThanEleven = (number) => {
 
 const numbersGreaterThanEleven = every(everyNumbers, isGreaterThanEleven);
 
-console.log(numbersGreaterThanEleven);
+testResult(
+  numbersGreaterThanEleven,
+  true,
+  "Every returns true if all numbers are greater than eleven",
+);
 
 // reduce
 const reduce = (array, instructionFunction, startingValue) => {
   let totalValue = startingValue;
+  const length = array.length;
 
-  for (let i = 0; i < array.length; i += 1) {
-    totalValue = instructionFunction(totalValue, array[i], i, array);
+  for (let i = 0; i < length; i += 1) {
+    if (!(i in array)) {
+      continue;
+    }
+
+    if (totalValue === undefined) {
+      totalValue = array[i];
+    } else {
+      totalValue = instructionFunction(totalValue, array[i], i, array);
+    }
   }
   return totalValue;
 };
@@ -142,6 +212,6 @@ const addNumbers = (total, currentNumber) => {
   return total + currentNumber;
 };
 
-const reduceTotal = reduce(reduceNumbers, addNumbers, 0);
+const reduceTotal = reduce(reduceNumbers, addNumbers);
 
-console.log(reduceTotal);
+testResult(reduceTotal, 39, "The total is 39");
